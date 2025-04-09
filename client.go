@@ -874,6 +874,10 @@ func (cli *Client) StoreLIDPNMapping(ctx context.Context, first, second types.JI
 	} else {
 		return
 	}
+	if cli.Store.LIDs == nil {
+		cli.Log.Errorf("Store does not support LID-PN mapping")
+		return
+	}
 	err := cli.Store.LIDs.PutLIDMapping(ctx, lid, pn)
 	if err != nil {
 		cli.Log.Errorf("Failed to store LID-PN mapping for %s -> %s: %v", lid, pn, err)

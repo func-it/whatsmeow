@@ -272,6 +272,8 @@ func (cli *Client) decryptMessages(info *types.MessageInfo, node *waBinary.Node)
 		if info.SenderAlt.Server == types.HiddenUserServer {
 			senderEncryptionJID = info.SenderAlt
 			cli.migrateSessionStore(info.Sender, info.SenderAlt)
+		} else if lids := cli.Store.LIDs; lids == nil {
+			cli.Log.Errorf("Failed to get LID store for %s", info.Sender)
 		} else if lid, err := cli.Store.LIDs.GetLIDForPN(context.TODO(), info.Sender); err != nil {
 			cli.Log.Errorf("Failed to get LID for %s: %v", info.Sender, err)
 		} else if !lid.IsEmpty() {

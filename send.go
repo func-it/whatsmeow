@@ -1148,12 +1148,16 @@ func (cli *Client) encryptMessageForDevices(
 		}
 		encryptionIdentity := jid
 		if jid.Server == types.DefaultUserServer {
-			lidForPN, err := cli.Store.LIDs.GetLIDForPN(ctx, jid)
-			if err != nil {
-				cli.Log.Warnf("Failed to get LID for %s: %v", jid, err)
-			} else if !lidForPN.IsEmpty() {
-				cli.migrateSessionStore(jid, lidForPN)
-				encryptionIdentity = lidForPN
+			if cli.Store.LIDs == nil {
+				cli.Log.Warnf("No LID store available, can't encrypt for %s", jid)
+			} else {
+				lidForPN, err := cli.Store.LIDs.GetLIDForPN(ctx, jid)
+				if err != nil {
+					cli.Log.Warnf("Failed to get LID for %s: %v", jid, err)
+				} else if !lidForPN.IsEmpty() {
+					cli.migrateSessionStore(jid, lidForPN)
+					encryptionIdentity = lidForPN
+				}
 			}
 		}
 
