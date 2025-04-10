@@ -150,6 +150,10 @@ func (c *Container) scanDevice(row dbutil.Scannable) (*store.Device, error) {
 	device.Account = &account
 	device.FacebookUUID = fbUUID.UUID
 
+	if c.LIDMap == nil {
+		c.log.Errorf("LIDMap is nil, this is unexpected")
+	}
+
 	innerStore := NewSQLStore(c, *device.ID)
 	device.Identities = innerStore
 	device.Sessions = innerStore
@@ -240,6 +244,7 @@ func (c *Container) NewDevice() *store.Device {
 
 		DatabaseErrorHandler: c.DatabaseErrorHandler,
 
+		LIDs:           NewCachedLIDMap(c.db),
 		NoiseKey:       keys.NewKeyPair(),
 		IdentityKey:    keys.NewKeyPair(),
 		RegistrationID: mathRand.Uint32(),
